@@ -46,7 +46,7 @@ class GeoFile(object):
         editing_xy = False
         
         for line in self.og_lines:
-            if line.split('=')[0] == 'XS GIS Cut Line':
+            if line.split('=')[0] == 'XS GIS Cut Line' or line.split('=')[0] == 'Reach XY':
                 editing_xy = True
                 self.new_lines.append(line)
                 continue 
@@ -56,12 +56,17 @@ class GeoFile(object):
             
             if line.split('=')[0] == '#Sta/Elev':
                 editing_xy = False
+
+            if line.split('=')[0] == 'Rch Text X Y':
+                editing_xy = False
+
+            if line.split('=')[0] == 'Reverse River Text':
+                editing_xy = False
             
             # split up the line into its xy components
             # if a component is more than 16 characters long, remove the 
             # last character. Then re-write everything to a string 
             if editing_xy == True:
-                print(line)
                 line = line.strip('\n')
                 og_points = [line[i:i+16] for i in range(0, len(line), 16)]
                 amended_points = []
@@ -75,7 +80,6 @@ class GeoFile(object):
                 for ap in amended_points:
                     new_line += ap.rjust(16, ' ')
                 new_line += '\n'
-                print(new_line)
                 self.new_lines.append(new_line)
             else:
                 self.new_lines.append(line)
